@@ -1,6 +1,7 @@
 """
 ML-сервис для предсказаний Diabetes (sklearn dataset).
 ДЗ по теме 24: Полноценный ML-сервис.
+ДЗ по теме 25: мониторинг — PrometheusMiddleware и /metrics (starlette-exporter).
 """
 import os
 from typing import List
@@ -8,6 +9,7 @@ from typing import List
 import mlflow.sklearn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 # Путь к модели (в Docker: /app/models/diabets)
 MODEL_PATH = os.environ.get("MODEL_PATH", "models/diabets")
@@ -25,6 +27,10 @@ app = FastAPI(
     description="API для предсказаний на основе sklearn diabetes dataset",
     version="1.0.0"
 )
+
+# ДЗ 25: экспорт метрик для Prometheus
+app.add_middleware(PrometheusMiddleware)
+app.add_route("/metrics", handle_metrics)
 
 
 # 10 признаков из sklearn.datasets.load_diabetes: age, sex, bmi, bp, s1, s2, s3, s4, s5, s6
